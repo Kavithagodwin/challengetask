@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    triggers {
+       cron 'H 10 * * *'
+       upstream ''
+    }
+
+    stages {
+        stage('fetch rocket data') {
+            steps {
+                sh '''
+                pwd
+                /usr/bin/curl -s 'https://api.spacexdata.com/v3/rockets' | /usr/local/bin/jq '.[] | [.rocket_name, .country]' >> data.txt
+                '''
+            }
+            
+        }
+            
+        stage('fetch payloads') {
+            steps {
+                sh '''
+                pwd
+                /usr/bin/curl -s 'https://api.spacexdata.com/v3/payloads' | /usr/local/bin/jq '.[] | [.payload_id, .payload_type]' >> data.txt
+                '''
+            }
+        }
+        
+        stage('uploading to s3') {
+            steps {
+                sh '''
+                pwd
+                /Library/Frameworks/Python.framework/Versions/3.9/bin/aws s3 ls
+                /Library/Frameworks/Python.framework/Versions/3.9/bin/aws s3 cp data.txt s3://challengetask
+                '''
+            }
+        }
+    }
+}
