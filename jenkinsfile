@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sh '''
                 pwd
-                /usr/bin/curl -s 'https://api.spacexdata.com/v3/rockets' | /usr/local/bin/jq '.[] | [.rocket_name, .country]' >> data.txt
+                /usr/bin/curl -s 'https://api.spacexdata.com/v3/rockets' | /usr/local/bin/jq '.[] | [.rocket_name, .country]' >> data.json
                 '''
             }
             
@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
                 pwd
-                /usr/bin/curl -s 'https://api.spacexdata.com/v3/payloads' | /usr/local/bin/jq '.[] | [.payload_id, .payload_type]' >> data.txt
+                /usr/bin/curl -s 'https://api.spacexdata.com/v3/payloads' | /usr/local/bin/jq '.[] | [.payload_id, .payload_type]' >> data.json
                 '''
             }
         }
@@ -30,7 +30,8 @@ pipeline {
                 sh '''
                 pwd
                 /Library/Frameworks/Python.framework/Versions/3.9/bin/aws s3 ls
-                /Library/Frameworks/Python.framework/Versions/3.9/bin/aws s3 cp data.txt s3://challengetask
+                /Library/Frameworks/Python.framework/Versions/3.9/bin/aws s3 cp data.json s3://challengetask
+                rm -rf data.json
                 '''
             }
         }
